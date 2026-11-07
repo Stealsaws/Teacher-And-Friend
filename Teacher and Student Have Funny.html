@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Teacher and Student Have Funny</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#eef3ee;--panel:#fbfdfb;--ink:#1d2a22;--sub:#6b7a70;
+  --mine:#2f9e6b;--mine-ink:#fff;--their:#fff;--their-ink:#1d2a22;--line:#d5dfd7;--chip:#dde8df;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#101712;--panel:#17211a;--ink:#e6efe8;--sub:#8fa196;--mine:#2f9e6b;--their:#223027;--their-ink:#e6efe8;--line:#2a3a2f;--chip:#223027}
+}
+:root[data-theme="dark"]{--bg:#101712;--panel:#17211a;--ink:#e6efe8;--sub:#8fa196;--mine:#2f9e6b;--their:#223027;--their-ink:#e6efe8;--line:#2a3a2f;--chip:#223027}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai","Sarabun","Tahoma",sans-serif;display:flex;justify-content:center}
+.app{width:100%;max-width:480px;height:100%;display:flex;flex-direction:column;background:var(--panel)}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.av{width:38px;height:38px;border-radius:50%;background:var(--mine);color:#fff;display:grid;place-items:center;font-weight:700}
+header b{display:block;font-size:16px}
+header span{font-size:12px;color:var(--sub)}
+#feed{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.row{display:flex;max-width:100%}
+.row.me{justify-content:flex-end}
+.b{max-width:78%;padding:9px 13px;border-radius:18px;line-height:1.5;font-size:15px;white-space:pre-wrap;word-break:break-word;animation:pop .18s ease-out}
+.them .b{background:var(--their);color:var(--their-ink);border:1px solid var(--line);border-bottom-left-radius:5px}
+.me .b{background:var(--mine);color:var(--mine-ink);border-bottom-right-radius:5px}
+.sys{align-self:center;background:var(--chip);color:var(--sub);font-size:12px;padding:4px 12px;border-radius:99px;margin:8px 0}
+.note{align-self:center;text-align:center;color:var(--sub);font-size:13px;max-width:85%;margin:6px 0}
+.seen{align-self:flex-end;font-size:11px;color:var(--sub);margin-top:-4px}
+.typing{display:flex;gap:4px;padding:12px 14px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:bl 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.end{align-self:center;text-align:center;margin:16px 6px;font-weight:700;font-size:17px}
+.end small{display:block;font-weight:400;color:var(--sub);margin-top:6px}
+footer{border-top:1px solid var(--line);padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.input{min-height:38px;border:1px solid var(--line);border-radius:20px;padding:8px 14px;font-size:15px;color:var(--ink);display:flex;align-items:center}
+.input.empty{color:var(--sub)}
+.ctl{display:flex;gap:8px}
+button{font:inherit;border:0;border-radius:20px;padding:11px 14px;cursor:pointer}
+button:focus-visible{outline:3px solid var(--mine);outline-offset:2px}
+#next{flex:1;background:var(--mine);color:#fff;font-weight:600}
+#auto{background:var(--chip);color:var(--ink)}
+button:disabled{opacity:.55;cursor:default}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+@keyframes bl{0%,60%,100%{opacity:.3}30%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.b{animation:none}.typing i{animation:none}#feed{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header><div class="av">ม</div><div><b>ครูมายด์</b><span id="status">ออนไลน์</span></div></header>
+  <div id="feed" aria-live="polite"></div>
+  <footer>
+    <div class="input empty" id="input">พิมพ์ข้อความ...</div>
+    <div class="ctl"><button id="next">แตะเพื่ออ่านต่อ</button><button id="auto">เล่นอัตโนมัติ</button></div>
+  </footer>
+</div>
+<script>
+var S=[
+["sys","วันจันทร์ 21.00 น."],
+["p","ครูครับ คืนนี้ผมเสร็จงาน 21.30 ทันเรียน 22.00 แน่นอน!"],
+["m","ได้ค่ะ รอนะคะ 😊"],
+["sys","เวลา 01.04 น."],
+["p","ครูครับ... ผมหลับคาโต๊ะ"],
+["draft",["ขอโทษครับ ผมผิดไปแล้ว ผมขอโทษจริงๆ","ผมไม่ควรทำแบบนี้เลย ผมขอโทษอีกครั้ง"]],
+["p","ขอโทษครับครู ขอเลื่อนเป็นสัปดาห์หน้านะครับ แน่นอน 100%\n(ย่อหน้าขอโทษ 4 ย่อหน้า ตัดมาให้อ่านพอสั้น)"],
+["m","ได้ค่ะ สัปดาห์หน้านะคะ 😊"],
+["p","ครูใจดีที่สุดในโลก!!"],
+["sys","สัปดาห์ต่อมา"],
+["p","ครูครับ ประชุมด่วน ขอเลื่อนครับ 🙏"],
+["m","ได้ค่ะ"],
+["sys","เลื่อนไปอีกสามรอบ"],
+["note","ปฏิทินของปุณ: เลื่อน 11 ครั้ง เรียนจริง 2 ครั้ง\nข้อความขอเลื่อนยาวกว่าข้อความทักทายทุกวัน"],
+["p","ครูครับ วันศุกร์ว่างไหมครับ ผมว่างจริงๆ แล้ว!"],
+["seen"],
+["note","ครูซีนแล้ว แต่ไม่ตอบ"],
+["draft",["ครูครับ","ครูคะ","ครูมายด์ยังอยู่ไหมครับ","ผมทำอะไรผิดหรือเปล่า"]],
+["note","ปุณเปิดแชตดูทุกห้านาที\nสรุปว่าตัวเองกลายเป็นฝ่าย \"รอ\" ไปแล้ว กรรมตามสนองชัดๆ"],
+["sys","ตี 2 ครูมายด์ขึ้นสถานะออนไลน์"],
+["p","!!! ครูยังตื่นอยู่ แต่ไม่ตอบผม!"],
+["p","หรือครูกำลังเลื่อนคลาสผมกลับ?"],
+["sys","สองสัปดาห์ต่อมา"],
+["m","สวัสดีค่ะปุณ ขอโทษที่หายไปนาน ช่วงนี้งานล้นมือจริงๆ ค่ะ"],
+["p","ครูกลับมาแล้ว!!! ครูไม่เป็นไรใช่ไหมครับ"],
+["m","สบายดีค่ะ แต่คลาสวันศุกร์นี้ ครูขอเลื่อนได้ไหมคะ มีประชุมด่วน"],
+["note","ปุณจ้องหน้าจอเงียบ 3 วินาที"],
+["p","ได้ครับ... ครูเลื่อนได้เลยครับ 🥲"],
+["p","งั้นสัปดาห์หน้าผมไม่เลื่อนแน่นอน สัญญา!"],
+["m","ได้ค่ะ ขอสัญญาเป็นลายลักษณ์อักษรด้วยนะคะ 😏"],
+["draft",["ผมว่าผมต้องเลื่อนสัญญาก่อนครับ"]],
+["end"]
+];
+var feed=document.getElementById("feed"),inp=document.getElementById("input"),nb=document.getElementById("next"),ab=document.getElementById("auto"),st=document.getElementById("status");
+var i=0,busy=false,auto=false,lastMe=null;
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
+function down(){feed.scrollTop=feed.scrollHeight}
+function add(cls,txt){var d=document.createElement("div");d.className=cls;d.textContent=txt;feed.appendChild(d);down();return d}
+function bubble(who,txt){var r=document.createElement("div");r.className="row "+who;var b=document.createElement("div");b.className="b";b.textContent=txt;r.appendChild(b);feed.appendChild(r);down();if(who==="me")lastMe=r;return r}
+function setIn(t){inp.textContent=t||"พิมพ์ข้อความ...";inp.className="input"+(t?"":" empty")}
+async function step(){
+  if(busy)return;
+  if(i>=S.length){reset();return}
+  busy=true;nb.disabled=true;
+  var s=S[i++],k=s[0];
+  if(k==="sys")add("sys",s[1]);
+  else if(k==="note")add("note",s[1]);
+  else if(k==="seen"){if(lastMe)add("seen","อ่านแล้ว")}
+  else if(k==="p"){
+    var t=s[1];setIn("");
+    for(var n=1;n<=Math.min(t.length,18);n++){}
+    await sleep(350);bubble("me",t);
+  }
+  else if(k==="m"){
+    st.textContent="กำลังพิมพ์...";
+    var r=document.createElement("div");r.className="row them";r.innerHTML='<div class="b typing"><i></i><i></i><i></i></div>';feed.appendChild(r);down();
+    await sleep(900);r.remove();st.textContent="ออนไลน์";bubble("them",s[1]);
+  }
+  else if(k==="draft"){
+    for(var a=0;a<s[1].length;a++){
+      var t2=s[1][a];
+      for(var c=1;c<=t2.length;c++){setIn(t2.slice(0,c));await sleep(35)}
+      await sleep(450);
+      if(a<s[1].length-1||i<S.length-1){for(var d=t2.length;d>=0;d-=3){setIn(t2.slice(0,Math.max(d,0)));await sleep(25)}}
+      setIn("");await sleep(200);
+    }
+  }
+  else if(k==="end"){
+    var e=add("end","จบ");e.innerHTML="จบ<small>ครูมายด์ 1 : ปุณ 0</small>";
+    nb.textContent="อ่านใหม่อีกรอบ";auto=false;ab.disabled=true;
+  }
+  busy=false;nb.disabled=false;
+  if(auto&&i<S.length)setTimeout(step,700);
+  else if(k!=="end"&&i<S.length)nb.textContent="แตะเพื่ออ่านต่อ";
+}
+function reset(){feed.innerHTML="";i=0;lastMe=null;setIn("");nb.textContent="แตะเพื่ออ่านต่อ";ab.disabled=false;ab.textContent="เล่นอัตโนมัติ";auto=false}
+nb.onclick=step;
+ab.onclick=function(){auto=!auto;ab.textContent=auto?"หยุดเล่น":"เล่นอัตโนมัติ";if(auto)step()};
+</script>
+</body>
+</html>
